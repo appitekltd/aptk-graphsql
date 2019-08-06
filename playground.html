@@ -1,0 +1,59 @@
+<apex:page controller="GraphQL" sidebar="false" applyBodyTag="false" standardStylesheets="false" showHeader="false">
+    
+  <head>   
+    <script type="text/javascript" src="js/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="js/codemirror/mode/javascript/javascript.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/codemirror/codemirror.css"/>
+    <link rel="stylesheet" type="text/css" href="css/app.css"/>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+  </head>
+
+  <body class="aptk no-cap no-header" onscroll="checkScroll()" style="padding-top: 130px">
+
+    <header class="aptk-subheader">
+      <div class="aptk-cap">
+        <img src="https://www.appitek.com/img/tool-graphsql-logo.svg"/>
+        <h1>GraphSQL Playground</h1>
+        <button class="aptk-button aptk-float--r action" onclick="runQuery()">
+          Run Query
+        </button>
+        <div class="aptk-subheader--nav aptk-float--r">
+          <ul>
+            <li>
+              Query Time: <span id="time"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="aptk-content">
+
+      <div class="graphql-query">
+        <label>GraphQL Query</label>
+        <textarea id="query" class="slds-textarea"></textarea>
+      </div>
+
+      <div class="graphql-variables">
+        <label>GraphQL Variables</label>
+        <textarea id="variables" class="slds-textarea"></textarea>
+      </div>
+
+      <div class="graphql-result">
+        <label>JSON Result</label>
+        <textarea id="result" class="slds-textarea"></textarea>
+      </div>
+
+    </main>
+              
+  </body>
+    
+  <script type="text/javascript">
+    var $Globals = {
+      REMOTE_ACTION: '{!$RemoteAction.GraphQL.runQuery}',
+      SESSION_ID: '{!$Api.Session_ID}'
+    };
+  </script>
+  <script type="text/javascript" src="js/app.js"></script>
+    
+</apex:page>

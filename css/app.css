@@ -1,0 +1,63 @@
+.CodeMirror,
+.CodeMirror * {
+  font-family: monospace !important;
+  font-size: 13px !important;
+}
+.aptk-content {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+}
+label {
+  font-size: 13px;
+  opacity: 0.5;
+}
+.graphql-query label {
+  position: absolute;
+  right: calc(100% - 410px);
+  bottom: 250px;
+  z-index: 100;
+}
+.graphql-query .CodeMirror {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  height: calc(100% - 260px);
+  width: 400px;
+}
+.graphql-variables label {
+  position: absolute;
+  right: calc(100% - 410px);
+  bottom: 30px;
+  z-index: 100;
+}
+.graphql-variables .CodeMirror {
+  position: absolute;
+  left: 20px;
+  height: 200px;
+  bottom: 20px;
+  width: 400px;
+}
+.graphql-result label {
+  position: absolute;
+  right: 30px;
+  bottom: 30px;
+  z-index: 100;
+}
+.graphql-result .CodeMirror {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  height: calc(100% - 40px);
+  left: 440px;
+}
+.noSidebarCell {
+  padding: 0px !important;
+}
+label {
+  position: relative;
+  z-index: 1000;
+}
