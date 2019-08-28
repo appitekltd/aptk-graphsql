@@ -1,3 +1,4 @@
+// store all the code mirrors in one place
 var $Editors = {
   query: CodeMirror.fromTextArea(document.getElementById('query'), {
     lineNumbers: true
@@ -11,6 +12,7 @@ var $Editors = {
   })
 };
 
+// set the default example query
 function setDefaults() {
   $Editors.query.setValue(
     '{\n' + 
@@ -36,6 +38,7 @@ function setDefaults() {
   runQuery();
 }
 
+// run a query by sending it to our GraphQL.runQuery() method
 function runQuery() {
   var timer = new Date();
   var query = $Editors.query.getValue();
@@ -45,39 +48,13 @@ function runQuery() {
   query, vars,
   function(result, event) {
     if (result != null) {
-      setValues(result, timer);
+      result = JSON.parse(result);
+      result = JSON.stringify(result, null, 2);
+      $Editors.results.setValue(result);
+      document.getElementById('time').innerText = (new Date() - timer) + 'ms';
     }
   }, {escape: false});
 }
 
-function testOther() {
-  var query = $Editors.query.getValue();
-  var vars = JSON.parse($Editors.variables.getValue());
-  var data = {
-    query: query,
-    variables: vars
-  };
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-      if (xhr.status == 200) {
-        console.log(xhr.response);
-      } else {
-        console.error(xhr.response);
-      }
-    }
-  }
-  console.log(JSON.stringify(data));
-  xhr.open('POST', 'https://aptk-graphql-dev-ed.my.salesforce.com/services/apexrest/graphql', true);
-  xhr.setRequestHeader('Authorization', 'Bearer ' + $Globals.SESSION_ID);
-  xhr.send(JSON.stringify(data));
-}
-
-function setValues(result, timer) {
-  result = JSON.parse(result);
-  result = JSON.stringify(result, null, 2);
-  $Editors.results.setValue(result);
-  document.getElementById('time').innerText = (new Date() - timer) + 'ms';
-}
-
+// set initial example query
 setDefaults();

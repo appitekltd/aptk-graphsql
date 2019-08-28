@@ -1,0 +1,10 @@
+<apex:page sidebar="false" standardStylesheets="false" showHeader="true">
+  <style>
+    html, body { width: 100%; height: 100%; margin: 0; padding: 0 }
+    iframe { width: 100%; height: 100%; border: none }
+    .sfdcBody .bodyDiv { height: 100% !important; }
+    #contentWrapper { height: 100%; }
+    .outerNoSidebar { height: 100%; }
+  </style>
+  <iframe src="https://www.appitek.com/pages/tools/graphsql-docs.html"/>
+</apex:page>

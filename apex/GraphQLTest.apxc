@@ -1,0 +1,34 @@
+/*
+ *  @class - GraphQLTest
+ *  @desc - Basic test for the GraphQL class
+ */
+@IsTest
+private class GraphQLTest {
+    
+  // test a query is parsed and does not error
+  @IsTest
+  private static void testRunQuery() {
+    // test basic query
+    String query = '{ Nickname: Account(limit:1){Id Name Contact{Id Name} Lead(Name:$test) {Id Name}}';
+    Map<String, String> vars = new Map<String, String>();
+    vars.put('test', 'tester');
+    String test = GraphQL.runQuery(query, vars);
+    // should have run 2 queries
+    System.debug(test);
+    System.assertEquals(-1, test.indexOf('"queries":null'));
+    // data should not be null
+    System.assertEquals(-1, test.indexOf('"data":null'));
+    // errors should not be null
+    System.assertNotEquals(-1, test.indexOf('"errors":[]'));
+  }
+    
+  // test endpoint recieves the data
+  @IsTest
+  private static void testPostQuery() {
+    Test.setMock(HttpCalloutMock.class, new GraphQLTestMock());
+    String test = GraphQL.postQuery();
+    // check response is not null
+    System.assertNotEquals(null, test);
+  }
+
+}
