@@ -22,6 +22,29 @@ private class GraphQLTest {
     System.assertNotEquals(-1, test.indexOf('"errors":[]'));
   }
     
+  // test a mutation is parsed and does not error
+  @IsTest
+  private static void testRunMutation() {
+    // test basic query
+    String query = 'mutation { Account(name:Test){ Id } }';
+    Map<String, String> vars = new Map<String, String>();
+    vars.put('test', 'tester');
+    String test = GraphQL.runQuery(query, vars);
+    // should have run 2 queries
+    System.debug(test);
+    System.assertEquals(-1, test.indexOf('"mutations":null'));
+    // data should not be null
+    System.assertEquals(-1, test.indexOf('"data":null'));
+    // errors should not be null
+    System.assertNotEquals(-1, test.indexOf('"errors":[]'));
+  }
+    
+  // test logger is called
+  @IsTest
+  private static void testLog() {
+    GraphQL.updateStat('aptk_graphql__count_mutations_api'); 
+  }
+    
   // test endpoint recieves the data
   @IsTest
   private static void testPostQuery() {
