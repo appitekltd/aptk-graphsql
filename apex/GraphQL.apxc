@@ -7,9 +7,11 @@
 @RestResource(urlMapping='/graphql')
 global with sharing class GraphQL {
     
+    
   // globals to store our queries and errors as we go
   global static List<String> parseErrors  = new List<String>();
   global static List<String> queries = new List<String>();
+    
     
   /*
    *  @method - postquery()
@@ -19,66 +21,223 @@ global with sharing class GraphQL {
   @HttpPost
   global static String postQuery() {
     try {
+        
       // get request data
       RestRequest req = RestContext.request;
-      String data = req.requestBody.toString();
+      System.debug(req);
+      String body = req.requestBody.toString();
+        
       // parse post structure
-      PostData post = (PostData) JSON.deserialize(data, PostData.class);
+      System.debug(body);
+      if (body == '' || body == null) {
+        parseErrors.add('Empty request body, check your request.');
+        ResultData data = new ResultData();
+        data.data = null;
+        data.errors = parseErrors;
+        data.queries = null;
+        return JSON.serialize(data);
+      }
+      PostData post = (PostData) JSON.deserialize(body, PostData.class);
+        
+      // check type for stats
+      String statName = post.query.indexOf('mutation') == 0 ? 'aptk_graphql__count_mutations_api' : 'aptk_graphql__count_queries_api';
+      updateStat(statName);
+        
       // run the query through our logic
       return runQuery(post.query, post.variables);
+        
     } catch(Exception err) {
+        
+      // catch and return error
       parseErrors.add(err.getMessage());
       ResultData data = new ResultData();
       data.data = null;
       data.errors = parseErrors;
       data.queries = null;
       return JSON.serialize(data);
+        
     }
   }
     
+    
+  @RemoteAction
+  public static void updateStat(String statName) {
+    GraphQLLog.updateStat(statName);
+  }
+    
+    
   /*
-   *  @method -runQuery()
+   *  @method - runQuery()
    *  @desc - Runs the given GraphQL query, using any passed in variables.
    *    This function is also called in the VF page so is exactly the same 
-   *    result between the playground and API (albeit playground is slower)
+   *    result between the playground and API (albeit playground is slower due to remoting)
    */
   @AuraEnabled
   @RemoteAction
   global static String runQuery(String query, Map<String, Object> variables) {
+      
     // create empty result
     Map<String, Object> result = new Map<String, Object>();
+      
     // update any variables in the query
     if (variables != null) {
       for (String var : variables.keySet()) {
-        String encode = EncodingUtil.urlEncode(String.valueOf(variables.get(var)), 'UTF-8');
-        query = query.replaceAll('\\$' + var, encode);
+        query = query.replaceAll('\\$' + var, String.valueOf(variables.get(var)));
       }
     }
+      
     // make sure the query isn't blank
     if (query == null || query == '{}' || query == '') {
       parseErrors.add('Invalid GraphQL Query, please check your syntax.');
     }
-    // get our request parsed as JSON structure
-    Map<String, ObjectData> objectRequest = graphQLToJson(query);
-    // for each of the objects in our json build the query for it
-    // we then run the query and save the data back on the object
-    for (String objectName : objectRequest.keySet()) {
-      ObjectData obj = objectRequest.get(objectName);
-      objectRequest.put(objectName, addQuery(obj, null));
+      
+    // check if this is a mutation
+    if (query.indexOf('mutation') == 0) {
+        
+      // get mutation query
+      Integer len = query.indexOf('mutation ') == 0 ? 9 : 8;
+      query = query.substring(len, query.length());
+        
+      // get our request parsed as JSON structure
+      Map<String, ObjectData> objectRequest = graphQLToJson(query);
+        
+      // our 'queryOptions' are now our new object fields, so use that to create a record
+      for (String obj : objectRequest.keySet()) {
+        runMutation(objectRequest.get(obj), null, null);
+      }
+        
+      // now we have the data for each object we build our results object
+      for (String objectName : objectRequest.keySet()) {
+        ObjectData obj = objectRequest.get(objectName);
+        result.put(obj.objectNickname, updateResults(obj.queryResults, obj));
+      }
+        
+      // this is then returned as the result, passing in any errors we might have had
+      // and all the queries/inserts we ran
+      ResultData data = new ResultData();
+      data.data = result;
+      data.errors = parseErrors;
+      data.mutations = queries;
+      String res = JSON.serialize(data);
+      return res;
+    
+    } else {
+        
+      // get full query
+      Integer len = query.indexOf('query ') == 0 ? 6 : query.indexOf('query') == 0 ? 5 : 0;
+      query = query.substring(len, query.length());
+        
+      // not a mutation, run queries
+      // get our request parsed as JSON structure
+      Map<String, ObjectData> objectRequest = graphQLToJson(query);
+        
+      // for each of the objects in our json build the query for it
+      // we then run the query and save the data back on the object
+      for (String objectName : objectRequest.keySet()) {
+        ObjectData obj = objectRequest.get(objectName);
+        objectRequest.put(objectName, addQuery(obj, null));
+      }
+        
+      // now we have the data for each object we build our results object
+      for (String objectName : objectRequest.keySet()) {
+        ObjectData obj = objectRequest.get(objectName);
+        result.put(obj.objectNickname, updateResults(obj.queryResults, obj));
+      }
+        
+      // this is then returned as the result, passing in any errors we might have had
+      // and all the queries we ran
+      ResultData data = new ResultData();
+      data.data = result;
+      data.errors = parseErrors;
+      data.queries = queries;
+      String res = JSON.serialize(data);
+      return res; 
+        
+    } 
+  }
+    
+    
+  /*
+   *  @method - runMutation()
+   *  @desc - Runs a mutation action, running any subsequent child mutations by passing 
+   *    in parent data
+   */
+  private static void runMutation(ObjectData obj, String parentId, String parentField) {
+    try {
+      
+      // create new object to be upserted
+      String objName = obj.objectName;
+      sObject newObj = Schema.getGlobalDescribe().get(objName).newSObject();
+      Map<String, String> objFields = obj.queryOptions;
+      List<String> insertFields = new List<String>(); // used later for debug 
+      List<String> insertValues = new List<String>(); // used later for debug 
+      for (String field : objFields.keySet()) {
+        Object val = objFields.get(field);
+        insertFields.add(field);
+        insertValues.add(String.valueOf(val));
+        newObj.put(field, val);
+      }
+        
+      // add parent if any
+      if (parentId != null && parentField != null) {
+        insertFields.add(parentField);
+        insertValues.add(parentId);
+        newObj.put(parentField, parentId);  
+        if (obj.requestFields.indexOf(parentField) == -1) obj.requestFields.add(parentField);
+      }
+            
+      // upsert the new record
+      upsert newObj;
+        
+      // the requestFields are then used to return data
+      String newObjFields = String.join(obj.requestFields, ', ');
+      String newQuery = 'SELECT ' + newObjFields + ' FROM ' + objName + ' WHERE Id = \'' + newObj.Id + '\'';
+      String insertQuery = getMutation(objName, insertFields, insertValues);
+      queries.add(insertQuery);
+      List<sObject> queryObj = Database.query(newQuery);
+      obj.queryResults = queryObj;
+        
+      // check for child and if there is one, run again but pass in parent id
+      for (String childName : obj.requestChildren.keySet()) {
+        ObjectData child = obj.requestChildren.get(childName);
+        String childField = obj.actualChildren.get(childName);
+        if (childField != null) runMutation(child, newObj.Id, childField);
+      }
+            
+      } catch(Exception e) {
+        parseErrors.add(e.getMessage());
+      }
+  }
+    
+    
+  /*
+   *  @method - getMutation()
+   *  @desc - Creates a user debug string to show the sort of mutation that occured, using the SQL 
+   *    syntax for INSERT INTO or UPDATE
+   */
+  private static String getMutation(String objName, List<String> insertFields, List<String> insertValues) {
+      
+    // check mutation type based on whether we had an id or not
+    String mutationType = insertFields.indexOf('Id') != -1 || insertFields.indexOf('id') != -1 ? 'UPDATE' : 'INSERT';
+      
+    // create string
+    if (mutationType == 'INSERT') {
+      return 'INSERT INTO ' + objName + ' (' + String.join(insertFields, ', ') + ') VALUES (' + String.join(insertValues, ', ') + ')';
+    } else {
+        
+      // for updates we need to re-arrange the data
+      List<String> setValues = new List<String>();
+      String sfid;
+      for (Integer i = 0; i < insertFields.size(); i++) {
+        if (insertFields[i] == 'Id' || insertFields[i] == 'id') {
+          sfid = insertValues[i];
+        } else {
+          setValues.add(insertFields[i] + ' = ' + insertValues[i]);  
+        }   
+      }
+      return 'UPDATE ' + objName + ' SET (' + String.join(setValues, ', ') + ') WHERE Id = \'' + sfid + '\'';
+        
     }
-    // now we have the data for each object we build our results object
-    for (String objectName : objectRequest.keySet()) {
-      ObjectData obj = objectRequest.get(objectName);
-      result.put(obj.objectNickname, updateResults(obj.queryResults, obj));
-    }
-    // this is then returned as the result, passing in any errors we might have had
-    // and all the queries we ran
-    ResultData data = new ResultData();
-    data.data = result;
-    data.errors = parseErrors;
-    data.queries = queries;
-    String res = JSON.serialize(data);
-    return res;
   }
 
   
@@ -88,27 +247,34 @@ global with sharing class GraphQL {
    *    we need about each section. See the ObjectData class for more details.
    */
   private static Map<String, ObjectData> graphQLToJson(String query) {
+      
     // Remove any extra spacing and ensure all tabs / spaces are consistant
     // Also add in 'object' start and end points
     query = normaliseGraphQL(query);
+      
     // Split the query into each finished section
     List<String> sections = query.split('\\}');
+      
     // This json will match the structure of the GraphQL query
     Map<String, ObjectData> json = new Map<String, ObjectData>();
+      
     // As we go down into nested objects and back up we keep track of
     // What our current object is and how far down we've gone
-  	ObjectData current;
+    ObjectData current;
     List<ObjectData> history = new List<ObjectData>();
+      
     // Go through each section
     for (Integer s = 0; s < sections.size(); s++) {
       List<String> section = sections[s].split('\\{');
       for (Integer i = 0; i < section.size(); i++) {
         String segment = section[i];
         if (segment != '') {
+            
           // start of an object nest
           if (segment.indexOf('XSTARTX') != -1 && segment.indexOf('XENDX') == -1) {
             List<String> parameters = segment.split(' ');
             String objec = parameters[parameters.size() - 2];
+              
             // only object
             if (parameters.size() == 2) {
               ObjectData obj = getObject(objec);
@@ -119,23 +285,28 @@ global with sharing class GraphQL {
               } else {
                 break;
               }
+                
             // has fields
             } else if (parameters.size() > 2) {
               parameters.remove(parameters.size() - 1);
               parameters.remove(parameters.size() - 1);
+                
               // get fields
               List<String> fields = new List<String>();
               for (Integer p = 0; p < parameters.size(); p++) {
                 if (parameters[p] != '') fields.add(parameters[p]);    
               }
+                
               // get the specific object
               ObjectData obj = getObject(objec);
               if (obj != null) {
                 if (current == null) {
+                    
                   // set the object as the first current
                   json.put(obj.objectName, obj);
                   current = json.get(obj.objectName);
                 } else {
+                    
                   // otherwise update the current
                   current.requestFields = fields;
                   current.requestChildren.put(obj.objectName, obj);
@@ -146,8 +317,10 @@ global with sharing class GraphQL {
                 break;
               }
             }
+              
           // go up an object in the stack
           } else if (segment.indexOf('XENDX') != -1) {
+              
             // update our history
             if (history.size() > 0) history.remove(history.size() - 1);
             current = history.size() - 1 > 0 ? history[history.size() - 1] : null;
@@ -157,10 +330,12 @@ global with sharing class GraphQL {
               ObjectData obj = getObject(objec);
               if (obj != null) {
                 if (current == null) {
+                    
                   // set the object as the first current
                   json.put(obj.objectName, obj);
                   current = json.get(obj.objectName);
                 } else {
+
                   // otherwise update the current
                   current.requestChildren.put(obj.objectName, obj);
                   current = current.requestChildren.get(obj.objectName);
@@ -169,6 +344,7 @@ global with sharing class GraphQL {
                 break;
               }
             } else if (segment.indexOf(' ') != -1 && current != null) {
+                
               // make sure fields get added to the correct object
               List<String> fields = segment.split('XENDX')[1].split(' ');
               for (Integer f = 0; f < fields.size(); f++) {
@@ -176,6 +352,7 @@ global with sharing class GraphQL {
               }
             }
           } else {
+              
             // make sure fields get added to the correct object
             List<String> fields = segment.split(' ');
             for (Integer f = 0; f < fields.size(); f++) {
@@ -195,26 +372,31 @@ global with sharing class GraphQL {
    *    of specific sections / objects
    */
   private static String normaliseGraphQL(String query) {
+      
     // get rid of the first opening bracket
     query = query.replaceFirst('\\{', '');
+      
     // mark all starts and ends, and remove parameter spacing
     query = query.replaceAll('\\}', '}XENDX ').replaceAll('\\{', ' XSTARTX{').replace(': ', ':');
     String newquery;
+      
     // make all query options consistent
     List<String> segments = query.split('\\(');
     for (Integer s = 0; s < segments.size(); s++) {
       String open = s == 0 ? '' : '(';
       String segment = open + segments[s];
       if (segment.indexOf(')') != -1) {
-        String start = segment.split('\\)')[0].replaceAll(' ', ',');
-        segment = start + ')' + segment.split('\\)')[1];
-      }
+        String start = segment.split('\\)')[0].replaceAll(', ', ',').replaceAll(' ', 'XSPACEX');
+        segment = start + segment.split('\\)')[1];
+      } 
       if (segment != null) newquery += segment;
     }
+      
     // make any spacing consistent
     newquery = newquery.replaceAll('\n', '').replaceAll('\t\t', ' ').replaceAll('\t', ' ').replaceAll('  ', ' ').replaceAll(': ', ':');
     return newquery;
   }
+    
 
   /*
    *  @method -  getObject()
@@ -222,21 +404,26 @@ global with sharing class GraphQL {
    *    passed in, i.e. Nickname: Account(limit:2)
    */
   private static ObjectData getObject(String objectName) {
+      
+    // init data
     ObjectData obj = new ObjectData();
     List<String> optionList = new List<String>();
     Map<String, String> options = new Map<String, String>();
     String nickname = null;
+    String reference = null;
+      
     // if we have options add them to the option list
     if (objectName.indexOf('(') != -1) {
-      String opts = objectName.split('\\(')[1].split('\\)')[0];
+      String opts = objectName.split('\\(')[1].split('\\)')[0].replaceAll('XSPACEX', ' ');
       optionList = opts.split(',');
       for (Integer o = 0; o < optionList.size(); o++) {
         String lhs = optionList[o].split(':').size() > 0 ? optionList[o].split(':')[0] : null;
         String rhs = optionList[o].split(':').size() > 1 ? optionList[o].split(':')[1] : null;
-        options.put(lhs, rhs);
+        if (lhs != '' && lhs != null) options.put(lhs, rhs);
       }
       objectName = objectName.split('\\(')[0];
     }
+      
     // if we have a nickname set the nickname
     if (objectName.indexOf(':') != -1) {
       nickname = objectName.split(':')[0];
@@ -244,19 +431,29 @@ global with sharing class GraphQL {
     } else {
       nickname = objectName;
     }
+      
+    // if we have a reference name set it, i.e. Contact[AccountId](limit:2)
+    if (objectName.indexOf('[') != -1 && objectName.indexOf(']') != -1) {
+      reference = objectName.split('\\[')[1].split('\\]')[0];
+      objectName = objectName.split('\\[')[0];
+    }
+      
     // get the actual object in SF and it's relationships
     SObjectType objType = Schema.getGlobalDescribe().get(objectName);
     Map<String, String> actualChildren = new Map<String, String>();
     List<String> actualFields = new List<String>();
     if (objType != null) {
+        
       // get the metadata so we can describe the fields
       Schema.DescribeSObjectResult objMeta = objType.getDescribe();
       Map<String, Schema.SObjectField> objFields = objMeta.fields.getMap();
+        
       // we use this so we can check fields given to us are valid SF fields
       for (String field : objFields.keySet()) {
         String name = objFields.get(field).getDescribe().getName();
         actualFields.add(name);
       }
+        
       // same again with the children so we can check if we have nested valid
       // children objects
       List<Schema.ChildRelationship> children = objMeta.getChildRelationships();
@@ -265,16 +462,19 @@ global with sharing class GraphQL {
         String relationship = children[c].getField().getDescribe().getName();
         actualChildren.put(name, relationship);
       }
+        
     } else {
       // invalid object
       parseErrors.add(objectName + ' is not a valid sObject.'); return null;
     }
+      
     // set object data
     obj.queryOptions = options;
     obj.queryString = null;    
     obj.queryResults = new List<sObject>();
     obj.queryResultIds = new List<Id>();
     obj.objectName = objectName;
+    obj.referenceName = reference;
     obj.objectNickname = nickname;
     obj.actualFields = actualFields;
     obj.requestFields = new List<String>();
@@ -283,17 +483,22 @@ global with sharing class GraphQL {
     return obj;
   }
     
+    
   /*
    *  @method - addQuery()
    *  @desc - Turns our object structure into a valid SQOL query, then runs
    *    that query and returns the object with updated results
    */ 
   private static ObjectData addQuery(ObjectData obj, ObjectData parent) {
+      
     // get the SQL query
     obj.queryString = jsonToSQL(obj, parent);
+    System.debug(obj.queryString);
     try {
+        
       // run the query
       List<sObject> results = Database.query(obj.queryString);
+        
       // set the results to the object to use in potential nested objects
       List<Id> ids = new List<Id>();
       for (Integer r = 0; r < results.size(); r++) {
@@ -301,17 +506,22 @@ global with sharing class GraphQL {
       }
       obj.queryResultIds = ids;
       obj.queryResults = results;
+        
       // add child object records and run their queries too
       for (String child : obj.requestChildren.keySet()) {
         ObjectData chi = obj.requestChildren.get(child);
         obj.requestChildren.put(child, addQuery(chi, obj));
       }
       return obj;
+        
     } catch(Exception err) {
+        
       // if any queries fail we add that error and return the object anyay
       parseErrors.add(err.getMessage()); return obj;
+        
     }
   }
+    
     
   /*
    *  @method - jsonToSQL()
@@ -319,31 +529,50 @@ global with sharing class GraphQL {
    *    parent links if needed
    */ 
   private static String jsonToSQL(ObjectData obj, ObjectData parent) {
+      
     // make sure we only use real fields from the metadata
     // this ignores any fields specified in the GraphQL query that are not 
     // real SF fields
     List<String> realFields = new List<String>();
     for (Integer f = 0; f < obj.requestFields.size(); f++) {
       String field = obj.requestFields[f];
-      if (obj.actualFields.indexOf(field) != -1) realFields.add(field);
+      // accept dot notation fields and assume the user knows what they're doing
+      if (obj.actualFields.indexOf(field) != -1 || field.indexOf('.') != -1) realFields.add(field);
     }
+      
     // set the parent link if any
     if (parent != null) {
       String link = parent.actualChildren.get(obj.objectName);
       if (link != null) realFields.add(link);
     }
+      
     // build the query
     String query = 
       'SELECT ' +
       String.join(realFields, ', ') +
       ' FROM ' + obj.objectName;
+      
     // add link IDs if there is a parent
     if (parent != null) {
-      String link = parent.actualChildren.get(obj.objectName);
+      String link;
+          
+      // if there is two relationships on the same object a user can select
+      // by setting the relationship name on the object, i.e. Contact[AccountId]
+      // if there's no relationship specified we pick the first one found
+      if (obj.referenceName == null) {
+        link = parent.actualChildren.get(obj.objectName);
+      } else {
+        for (String child : parent.actualChildren.keySet()) {
+          String check = parent.actualChildren.get(obj.objectName);  
+          if (check != null && check == obj.referenceName) link = check;
+        }
+      }
+      
       if (link != null) {
         query += ' WHERE ' + link + ' IN ' + '(\'' + String.join(parent.queryResultIds, '\', \'') + '\') ';
       }
     }
+      
     // add in any of our query options based on what was based into the object
     // i.e. (limit:2,Status:Open)
     for (Integer i = 0; i < realFields.size(); i++) {
@@ -357,14 +586,21 @@ global with sharing class GraphQL {
         }
       }
     }
+      
     // set offset and limis if any
-    String offset = obj.queryOptions.get('offset');
-    String lim = obj.queryOptions.get('limit');
+    String offset = obj.queryOptions.get('offset') != null ? obj.queryOptions.get('offset') : obj.queryOptions.get('Offset');
+    String lim = obj.queryOptions.get('limit') != null ? obj.queryOptions.get('limit') : obj.queryOptions.get('Limit');
+    String orderby = obj.queryOptions.get('orderBy') != null ? obj.queryOptions.get('orderBy') : obj.queryOptions.get('OrderBy');
+    String orderdir = obj.queryOptions.get('orderDir') != null ? obj.queryOptions.get('orderDir') : obj.queryOptions.get('OrderDir');
+    orderdir = orderdir == null ? 'ASC' : orderdir == 'ASC' ? 'ASC' : 'DESC';
+    if (orderby != null) query += ' ORDER BY ' + orderby + ' ' + orderdir;
     if (lim != null) query += ' LIMIT ' + lim;
     if (offset != null) query += ' OFFSET ' + offset;
     queries.add(query);
     return query;
+      
   }
+    
 
   /*
    *  @method - updateResults()
@@ -373,20 +609,49 @@ global with sharing class GraphQL {
    */ 
   private static List<Map<String, Object>> updateResults(List<sObject> results, ObjectData obj) {
     List<Map<String, Object>> updated = new List<Map<String, Object>>();
+      
     // check the fields were real
     List<String> realFields = new List<String>();
     for (Integer f = 0; f < obj.requestFields.size(); f++) {
       String field = obj.requestFields[f];
-      if (obj.actualFields.indexOf(field) != -1) realFields.add(field);
+      // accept dot notation fields and assume the user knows what they're doing
+      if (obj.actualFields.indexOf(field) != -1 || field.indexOf('.') != -1) realFields.add(field);
     }
+      
     // for each result on this object
     for (Integer i = 0; i < results.size(); i++) {
       Map<String, Object> res = new Map<String, Object>();
       sObject r = results[i];
+        
       // set the fields and their val to the result
       for (Integer f = 0; f < realFields.size(); f++) {
-        res.put(realFields[f], r.get(realFields[f]));
+        try {
+          String field = realFields[f];
+          if (field.indexOf('.') != -1) {
+              
+            List<String> dots = field.split('\\.');
+            String ref = dots[0];
+            Map<String, Object> robj = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(r));
+            Object result;
+            dots.remove(0);
+            Integer dotSize = dots.size();
+            System.debug(dots);
+            System.debug(dotSize);
+            for (Integer d = 0; d < dotSize; d++) {
+              if (d <  dotSize - 1 && dotSize > 1) {
+                robj = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(robj));
+              }
+              result = robj.get(dots[d]);
+            }
+            res.put(field, result);
+          } else {
+            res.put(field, r.get(field));
+          }
+        } catch(Exception e) {
+          parseErrors.add('Error: ' + e.getMessage());
+        }
       }
+        
       // add in any child object structures
       for (String child : obj.requestChildren.keySet()) {
         ObjectData cobj = obj.requestChildren.get(child);
@@ -403,9 +668,11 @@ global with sharing class GraphQL {
         res.put(cobj.objectNickname, updateResults(matches, cobj));
       }
       updated.add(res);
+        
     }
     return updated;
   }
+    
 
   // structure for the inbound post
   public class PostData {
@@ -413,12 +680,15 @@ global with sharing class GraphQL {
     public Map<String, String> variables;
   }
     
+    
   // structure for the returned result
   public class ResultData {
     public Map<String, Object> data;
     public List<String> errors;
     public List<String> queries;
+    public List<String> mutations;
   }
+    
     
   // custom structure to store each 'object' in the graphql query
   public class ObjectData {
@@ -428,10 +698,12 @@ global with sharing class GraphQL {
     public List<Id> queryResultIds;
     public String objectName;
     public String objectNickname;
+    public String referenceName;
     public List<String> requestFields;
     public List<String> actualFields;
     public Map<String, ObjectData> requestChildren;
     public Map<String, String> actualChildren;
   }
+    
 
 }

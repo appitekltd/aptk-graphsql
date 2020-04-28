@@ -21,11 +21,24 @@ label {
   bottom: 250px;
   z-index: 100;
 }
+.graphql-query--examples {
+  width: 400px;
+  height: 30px;
+  background: #f7f7f7;
+}
+
+.graphql-query--examples select {
+  border: 0px;
+  background: transparent;
+  height: 30px;
+  padding: 0 10px;
+  color: #999;
+}
 .graphql-query .CodeMirror {
   position: absolute;
   left: 20px;
-  top: 20px;
-  height: calc(100% - 260px);
+  top: 50px;
+  height: calc(100% - 290px);
   width: 400px;
 }
 .graphql-variables label {

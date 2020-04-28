@@ -1,0 +1,10 @@
+@IsTest
+public class GraphQLPostInstallTest {
+  
+  @IsTest
+  static void testInstallScript() {
+    GraphQLPostInstall postinstall = new GraphQLPostInstall();
+    Test.testInstall(postinstall, null);
+  }
+
+}

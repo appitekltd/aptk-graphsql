@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.graphsql_resources, 'js/codemirror/codemirror.css')}"/>
     <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.graphsql_resources, 'css/app.css')}"/>
     <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.graphsql_resources, 'css/style.css')}"/>
+    <style>
+      
+    </style>
   </head>
 
   <body class="aptk no-cap no-header" onscroll="checkScroll()" style="padding-top: 130px">
@@ -31,6 +34,15 @@
 
       <div class="graphql-query">
         <label>GraphQL Query</label>
+        <div class="graphql-query--examples">
+          <select id="examples" onchange="setDefaults()">
+            <option value="1" default="true">Query Example</option>   
+            <option value="2">Variable Example</option>    
+            <option value="3">Complex Query Example</option> 
+            <option value="4">Mutation Example</option>
+            <option value="5">Complex Mutation Example</option>
+          </select>    
+        </div> 
         <textarea id="query" class="slds-textarea"></textarea>
       </div>
 
@@ -51,6 +63,7 @@
   <script type="text/javascript">
     var $Globals = {
       REMOTE_ACTION: '{!$RemoteAction.GraphQL.runQuery}',
+      STAT_ACTION: '{!$RemoteAction.GraphQL.updateStat}',
       SESSION_ID: '{!$Api.Session_ID}'
     };
   </script>

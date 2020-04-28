@@ -1,0 +1,23 @@
+public without sharing class GraphQLLog {
+
+  /*
+   *  @method - updateStat()
+   *  @desc - Updates the FMA stat counts split between actual API usage and 
+   *    playground usage
+   *  @notes - stat names are:
+   *    aptk_graphql__count_mutations_api
+   *    aptk_graphql__count_mutations_pg
+   *    aptk_graphql__count_queries_api
+   *    aptk_graphql__count_queries_pg
+   */ 
+  @Future
+  public static void updateStat(String statName) {
+    System.debug(statName);
+    try {
+      if (!Test.isRunningTest() && UserInfo.getOrganizationId() != '00D4J000000GI7PUAW') { Integer current = FeatureManagement.checkPackageIntegerValue(statName); FeatureManagement.setPackageIntegerValue(statName, current + 1); }      
+    } catch (Exception e) {
+      System.debug('Error: ' + e.getMessage());
+    }
+  }
+    
+}

@@ -1,0 +1,48 @@
+<apex:page sidebar="false" standardStylesheets="false" applyBodyTag="false">
+
+  <head>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.GraphQLDocsResources, 'css/codemirror.css')}"/>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.GraphQLDocsResources, 'css/style.css')}"/>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.GraphQLDocsResources, 'css/fontawesome.css')}"/>
+    <script type="text/javascript" src="{!URLFOR($Resource.GraphQLDocsResources, 'js/documentation.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.GraphQLDocsResources, 'js/codemirror.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.GraphQLDocsResources, 'js/codemirror-javascript.js')}"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+
+  <body>
+
+    <div class="aptk aptk-iframed">
+
+      <main style="margin-top: 130px" class="aptk-content">
+
+        <div class="aptk-documentation">
+          <div class="aptk-cap">
+
+            <div class="aptk-documentation--menu">
+              <div class="aptk-documentation--search">
+                <input onkeydown="searchDocumentation(event, 'GraphSQL')" id="documentation-search" placeholder="Search documentation.."/>
+                <i class="fas fa-search"></i>
+              </div>
+              <ul id="documentation-menu"></ul>
+            </div>
+            <div class="aptk-documentation--content" id="documentation-content"></div>
+          </div>
+        </div>
+
+        <div id="form-popup" class="aptk-popup"></div>
+        <script type="text/javascript">
+          var $VF = true;
+          var $URL = "{!URLFOR($Resource.GraphQLDocsResources, 'screenshots')}";
+          var page = window.location.hash ? decodeURIComponent(window.location.hash.replace(/#/, '')) : 'Introduction';
+          loadDocumentation('GraphSQL', page);
+        </script>
+
+      </main>
+
+    </div>
+
+  </body>
+
+</apex:page>

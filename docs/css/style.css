@@ -1,0 +1,1592 @@
+/* fonts */
+@font-face {
+  font-family: 'Montserrat';
+  font-weight: 400;
+  src: url(./fonts/Montserrat-Regular.ttf) format('woff2');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-weight: 600;
+  src: url(./fonts/Montserrat-SemiBold.ttf) format('woff2');
+}
+
+.sfdcBody .bodyDiv { height: 100% !important; }
+#contentWrapper { height: 100% !important; }
+.outerNoSidebar { height: 100% !important; }
+.noSidebarCell { padding: 0px !important; }
+
+/* defaults */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #E0E5EB;
+}
+.aptk {
+  margin: 0;
+  padding: 0;
+  background: #E0E5EB;
+  color: #394F60;
+  font-family: 'Montserrat';
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  overflow-x: hidden;
+}
+.aptk h1, 
+.aptk h2, 
+.aptk h3, 
+.aptk h4, 
+.aptk h5, 
+.aptk h6,
+.aptk p, .aptk ul, .aptk li, .aptk a {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+.aptk h1, 
+.aptk h2, 
+.aptk h3, 
+.aptk h4, 
+.aptk h5, 
+.aptk h6 {
+  font-weight: 600;
+  opacity: 0.9;
+}
+.aptk p {
+  opacity: 0.8;
+}
+.aptk * {
+  font-family: 'Montserrat';
+  font-weight: 400;
+  box-sizing: border-box;
+}
+.aptk a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.aptk p a {
+  text-decoration: underline;
+}
+
+
+.aptk-header {
+  top: 0;
+  left: 0;
+  height: 80px;
+  position: fixed;
+  width: 100vw;
+  z-index: 100;
+  background: #263540;
+  transition: background-color 0.2s ease;
+}
+.aptk-header.home {
+  background: transparent;
+}
+.aptk-header.home .aptk-header--logo .white {
+  opacity: 1;
+}
+.aptk-header.home .aptk-header--logo .colour {
+  opacity: 0;
+}
+.aptk-header .aptk-header--logo .white {
+  opacity: 0;
+}
+.aptk-header .aptk-header--logo .colour {
+  opacity: 1;
+}
+.aptk-header.home .aptk-button {
+  background: #394F60;
+  color: #FFFFFF;
+}
+.aptk-header .aptk-button {
+  background: #FFFFFF;
+  color: #394F60;
+}
+.aptk-header--logo {
+  height: 40px;
+  padding: 20px 0;
+  transition: opacity 0.2s ease;
+  position: relative;
+}
+.aptk-header--logo > img {
+  height: 40px;
+  position: absolute;
+  left: 0;
+}
+.aptk-header--nav > ul {
+  list-style: none;
+  height: 80px;
+}
+.aptk-header--nav  > ul > li {
+  list-style: none;
+  float: left;
+  line-height: 40px;
+  position: relative;
+  padding: 20px;
+  opacity: 0.7;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+.aptk-header .aptk-button {
+  margin: 25px 0 0 10px;
+}
+.aptk-header--nav > ul > li:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+.aptk-header--nav > ul > li.selected {
+  opacity: 1;
+  cursor: pointer;
+  font-weight: 600;
+}
+.aptk-header--nav > ul > li:hover:after {
+  content: '';
+  position: absolute;
+  width: 0; 
+  height: 0; 
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 10px solid #FFFFFF;
+  bottom: 0px;
+  left: calc(50% - 20px);
+}
+.aptk-header--nav > ul > li.normal:after {
+  display: none;
+}
+
+
+.aptk-menu {
+  position: fixed;
+  top: 80px;
+  width: 100vw;
+  height: 0px;
+  left: 0px;
+  overflow: hidden;
+  padding: 0px;
+  color: #394F60;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+  box-shadow: 0 5px 5px rgba(59, 76, 89, 0.1);
+}
+.aptk-menu[data-show="true"] {
+  top: 80px;
+  height: auto;
+  padding: 20px;
+}
+.aptk-menu--nav {
+  display: none;
+  width: 100%;
+}
+.aptk-menu--nav[data-show="true"] {
+  display: block;
+}
+.aptk-menu--nav h2 {
+  display: none;
+}
+.aptk-menu--nav li:nth-child(odd) {
+  margin-right: 10px;
+}
+.aptk-menu--nav li {
+  height: auto;
+  padding: 5px 10px;
+  float: left;
+  width: calc(50% - 5px);
+  margin-bottom: 10px;
+  position: relative;
+  color: #394F60;
+  transition: background-color 0.2s ease;
+}
+.aptk-menu--nav li:hover {
+  background: rgba(224, 229, 235, 0.5);
+  cursor: pointer;
+}
+.aptk-menu--nav li img {
+  height: 50px;
+  padding: 5px 10px 5px 0;
+  float: left;
+}
+.aptk-menu--nav li h1 {
+  font-size: 16px;
+  font-weight: 600;
+  padding-top: 7px;
+}
+.aptk-menu--nav li p {
+  font-size: 13px;
+}
+.aptk-menu--nav li span {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  right: 0;
+  height: 100%;
+  text-align: center;
+  line-height: 50px;
+  display: block;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: not-allowed;
+}
+.aptk-menu--nav li:hover span {
+  opacity: 1;
+}
+
+
+.aptk-subheader {
+  position: fixed;
+  top: 80px;
+  z-index: 60;
+  height: 50px;
+  left: 0;
+  width: 100vw;
+  background: #FFFFFF;
+}
+.no-header .aptk-subheader {
+  top: 0px;
+}
+.aptk-subheader img {
+  float: left;
+  height: 50px;
+  padding: 10px 10px 10px 0;
+}
+.aptk-subheader h1 {
+  font-size: 18px;
+  padding: 10px 0;
+  color: #263540;
+  line-height: 30px;
+  float: left;
+}
+.aptk-subheader--nav,
+.aptk-subheader--nav ul {
+  height: 50px;
+}
+.aptk-subheader--nav li {
+  height: 50px;
+  float: left;
+  line-height: 30px;
+  font-size: 14px;
+  opacity: 0.7;
+  padding: 0;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+.aptk-subheader--nav li a {
+  padding: 10px 15px 10px 15px;
+  line-height: 30px;
+  height: 50px;
+  display: block;
+}
+.aptk-subheader--nav li.selected,
+.aptk-subheader--nav li:hover {
+  opacity: 1;
+  cursor: pointer;
+  background: rgba(224, 229, 235, 0.5);
+}
+.aptk-subheader--nav li.selected,
+.aptk-subheader--nav li.selected a {
+  font-weight: 600;
+}
+.aptk-subheader--nav li.selected {
+  background: rgba(224, 229, 235, 1);
+}
+.aptk-subheader .aptk-button {
+  margin: 10px 0 0 10px;
+}
+
+
+.aptk-iframed .aptk-header {
+  display: none;
+}
+.aptk-iframed .aptk-subheader {
+  display: none;
+}
+.aptk-iframed .aptk-content {
+  top: 0;
+  margin-top: 0px !important;
+}
+.aptk-iframed .aptk-documentation--menu {
+  top: 30px;
+}
+.aptk-documentation {
+  position: relative;
+  background: #E0E5EB;
+  font-family: 'Montserrat';
+}
+.aptk-documentation .aptk-cap {
+  position: relative;
+}
+.aptk-documentation--search {
+  margin-bottom: 20px;
+  background: #FFFFFF;
+  border-radius: 6px;
+  position: relative;
+}
+.aptk-documentation--search i {
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  font-size: 13px;
+  color: rgba(59, 76, 89, 0.7);
+}
+.aptk-documentation--search input {
+  background: #FFFFFF;
+  border-radius: 6px;
+  border: none;
+  height: 30px;
+  line-height: 30px;
+  width: 100%;
+  padding: 0 10px 0 30px;
+  border-radius: 4px;
+}
+.aptk-documentation--search input::-webkit-input-placeholder {
+  color: rgba(59, 76, 89, 0.7);
+}
+.aptk-documentation--search input:focus {
+  color: #21A2A8;
+  background: rgba(224, 229, 235, 0.4);
+  outline: none;
+}
+.aptk-documentation--menu {
+  width: 220px;
+  color: #263540;
+  position: fixed;
+  left: calc((100vw - 960px) / 2 + 20px);
+  top: 160px;
+}
+.aptk-documentation--menu > ul {
+  background: #FFFFFF;
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+  border-radius: 6px;
+  padding: 10px;
+}
+.aptk-documentation--menu > ul > li {
+  font-size: 14px;
+}
+.aptk-documentation--menu ul.sub > li {
+  font-size: 13px;
+  padding-left: 10px;
+  opacity: 0.9;
+}
+.aptk-documentation--menu ul li p {
+  display: block;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.aptk-documentation--menu ul li p:hover,
+.aptk-documentation--menu ul li p.selected {
+  color: #21A2A8;
+  background: rgba(224, 229, 235, 0.4);
+}
+.aptk-documentation--menu ul li p.selected {
+  font-weight: 600;
+}
+.aptk-documentation--highlight {
+  background: #394F60;
+  padding: 2px;
+  color: #FFFFFF;
+}
+.aptk-documentation--content {
+  margin-left: 250px;
+  margin-top: 30px;
+  padding: 0 0 100px 10px;
+  width: calc(100% - 250px);
+}
+.aptk-documentation--content h2 {
+  font-size: 18px;
+  margin-bottom: 5px;
+  color: #3d5e77;
+  opacity: 0.9;
+}
+.aptk-documentation--content h3 {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+  color: #3d5e77;
+}
+.aptk-documentation--content p {
+  font-size: 14px;
+  line-height: 20px;
+  opacity: 0.8;
+  color: #3d5e77;
+  margin-bottom: 30px;
+}
+.aptk-documentation--result {
+  padding: 20px 0;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(59, 76, 89, 0.1);
+}
+.aptk-documentation--result > p {
+  margin-top: 10px !important;
+  margin-bottom: 0px !important;
+}
+.aptk-documentation--content a {
+  color: #21A2A8;
+  text-decoration: underline;
+}
+.aptk-documentation--warning {
+  background: #BB4660;
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.10);
+  color: #FFFFFF;
+  font-size: 14px;
+  margin: 30px 0;
+}
+.aptk-documentation--image {
+  width: calc(100% - 60px);
+  border-radius: 6px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.10);
+  overflow: hidden;
+  margin: 30px auto;
+  transition: all 0.2s ease;
+  transform: scale(0.95);
+}
+.aptk-documentation--image:hover {
+  transform: scale(1);
+}
+.aptk-documentation--image img {
+  width: 100%;
+}
+.aptk-documentation--image p {
+  position: absolute;
+  margin: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: rgba(59, 76, 89, 0.8);
+  color: #FFFFFF;
+  font-size: 12px;
+  opacity: 1;
+  text-align: center;
+  padding: 0 10px;
+  line-height: 30px;
+}
+.aptk-documentation--links {
+  height: 30px;
+  padding: 0 10px;
+}
+.aptk-documentation--links .aptk-button {
+  float: right;
+  margin-left: 10px;
+}
+.aptk-documentation--list {
+  font-size: 14px;
+  margin-left: 20px;
+  list-style-type: disc;
+  opacity: 0.8;
+  margin-top: -20px;
+  margin-bottom: 30px;
+}
+.aptk-documentation--list.alt {
+  margin-top: 0px;
+}
+.aptk-documentation--list li {
+  list-style-type: disc;
+  margin-bottom: 10px;
+}
+.aptk-documentation--list li b {
+  font-weight: 600;
+}
+.aptk-documentation--code {
+  background-color: #131d25 !important;
+  color: #e0e5eb !important;
+  word-break: break-all;
+  font-size: 13px;
+  display: inline-block;
+  border-radius: 4px;
+  padding: 1px 2px;
+  font-family: monospace;
+}
+.aptk-documentation--block .CodeMirror {
+  display: inline-block;
+  width: calc(50% - 5px);
+  border-radius: 6px;
+  margin-bottom: 30px;
+}
+.CodeMirror, .CodeMirror * {
+  font-size: 11px !important;
+}
+.aptk-documentation--block .CodeMirror:nth-child(2) {
+  margin-right: 10px;
+}
+.CodeMirror,
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: #131d25 !important;
+  color: #e0e5eb !important;
+}
+.CodeMirror ::-webkit-scrollbar {
+  background-color: #131d25 !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+.CodeMirror ::-webkit-scrollbar-thumb {
+  background: #435563 !important;
+  border-radius: 4px !important;
+  border: 1px solid #131d25 !important;
+}
+.CodeMirror-selected {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.CodeMirror-gutters {
+  border-right: 5px solid transparent !important;
+  background-color: #131d25 !important;
+  color: #e0e5eb !important;
+}
+.CodeMirror-linenumber {
+  color: #e0e5eb !important;
+  opacity: 0.5 !important;
+}
+.cm-s-default .cm-string {color: #21a2a8 !important;}
+.cm-s-default .cm-number {color: #21a2a8 !important;}
+.cm-s-default .cm-error {color: #e0e5eb !important;}
+.cm-s-default .cm-atom {color: #e0e5eb !important;}
+
+.aptk-cap {
+  max-width: 960px;
+  padding: 0 20px;
+  margin: auto;
+}
+
+
+.aptk-content {
+  overflow-x: hidden;
+}
+
+
+.aptk-fader {
+  pointer-events: none;
+  height: 20vh;
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(to bottom right, #46BBAE, #21A2A8, #298192);
+  -webkit-mask-image: -webkit-gradient(linear, left 30%, left bottom, from(#46BBAE), to(rgba(0,0,0,0)));
+  mask-image: -webkit-gradient(linear, left 30%, left bottom, from(#46BBAE), to(rgba(0,0,0,0)));
+}
+.aptk-fader div {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  box-shadow: inset 0 0 20px rgba(59, 76, 89, 0.3);
+  background: linear-gradient(to bottom right, #46BBAE, #21A2A8, #298192);
+}
+
+
+.aptk-splash {
+  height: calc(100vh - 130px);
+  background: #21A2A8;
+  overflow: hidden;
+  width: 100vw;
+  background: linear-gradient(to bottom right, #46BBAE, #21A2A8, #298192);
+  color: #FFFFFF;
+  position: relative;
+  margin-top: 130px;
+}
+.aptk-splash.full {
+  margin-top: 0px;
+  height: calc(100vh);
+}
+.aptk-splash.small {
+  height: 250px;
+}
+.aptk-splash.small h1 {
+  font-size: 34px;
+}
+.aptk-splash table {
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+  color: #FFFFFF;
+  font-size: 18px;
+  position: relative;
+  z-index: 20;
+}
+.aptk-splash table td {
+  padding: 0 20px;
+}
+.aptk-splash h1 {
+  font-size: 50px;
+  position: relative;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+.aptk-splash h1 span {
+  display: inline-block;
+  position: absolute;
+  margin-top: 13px;
+}
+.aptk-splash h1 img {
+  display: inline-block;
+  height: 80px;
+  margin-right: 20px;
+  margin-bottom: -20px;
+}
+.aptk-splash .aptk-button {
+  margin: 20px 0;
+}
+.aptk-splash span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.aptk-splash--arrow {
+  position: absolute;
+  bottom: 10px;
+  width: 32px;
+  left: calc(50% - 16px);
+  z-index: 90;
+  animation: fade 2s infinite;
+}
+@keyframes fade {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+.aptk-fix {
+  max-width: 720px;
+  margin: auto;
+}
+
+
+.aptk-float--l {
+  float: left;
+}
+.aptk-float--r {
+  float: right;
+}
+
+
+/*img.def {
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.3);
+}*/
+
+
+.aptk-button {
+  height: 30px;
+  border-radius: 30px;
+  background: #394F60;
+  border: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  padding: 0 30px;
+  line-height: 30px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+.aptk-button.mobile {
+  padding: 0px;
+  position: fixed;
+  display: none;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  z-index: 10000;
+  background: #21A2A8;
+  color: #FFFFFF;
+  margin: 0px;
+}
+.aptk-button.mobile > div {
+  height: 2px;
+  background: #fff;
+  width: 20px;
+  margin: auto;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.aptk-button.mobile > div:after {
+  content: '';
+  height: 2px;
+  width: 20px;
+  background: #fff;
+  position: absolute;
+  left: 0;
+  top: -6px;
+  transition: all 0.2s ease;
+}
+.aptk-button.mobile > div:before {
+  content: '';
+  height: 2px;
+  width: 20px;
+  background: #fff;
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  transition: all 0.2s ease;
+}
+.aptk.mobile .aptk-button.mobile > div {
+  background: transparent;
+}
+.aptk.mobile .aptk-button.mobile > div:after {
+  transform: rotate(45deg);
+  top: 0px;
+}
+.aptk.mobile .aptk-button.mobile > div:before {
+  transform: rotate(-45deg);
+  bottom: 0px;
+}
+.aptk-button.mobile-contact {
+  display: none;
+  width: 100%;
+  color: #FFFFFF !important;
+  background: #394F60 !important;
+  margin: 0 0 0 0;
+}
+.aptk-header.home .aptk-button.mobile {
+  background: #394F60 !important;
+}
+.aptk-button:hover {
+  opacity: 0.7;
+  cursor: pointer;
+}
+.aptk-button.action {
+  background: #21A2A8;
+}
+.aptk-button.drive {
+  background: #46BBAE;
+}
+.aptk-button.full {
+  width: 100%;
+}
+.aptk-button[disabled="true"],
+.aptk-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aptk-factsheet {
+  width: calc(33.33% - 20px);
+  display: inline-block;
+  margin: 0 10px;
+  height: 60px;
+}
+.aptk-factsheet .aptk-button {
+  border-radius: 8px;
+  width: 100%;
+  height: 60px;
+}
+
+.aptk-splash .aptk-button {
+  height: 40px;
+  margin: 10px 5px;
+}
+
+.aptk-hex {
+  position: absolute;
+  z-index: 10;
+  transition: all 0.2s ease;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.aptk-hex.a {
+  width: 80px;
+}
+.aptk-hex.b {
+  width: 160px;
+}
+.aptk-hex.c {
+  width: 180px;
+}
+.aptk-hex.d {
+  width: 110px;
+}
+.aptk-hex.e {
+  width: 230px;
+}
+.aptk-hex.f {
+  width: 360px;
+}
+
+
+.aptk-highlights {
+  background: #394F60;
+  color: #FFFFFF;
+  position: relative;
+  z-index: 10;
+  padding: 80px 0 40px 0;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.3);
+  position: relative;
+  z-index: 40;
+}
+.aptk-highlights .aptk-cap > p {
+  line-height: 24px;
+  margin-top: 10px;
+}
+.aptk-highlights--list > ul {
+  overflow: auto;
+  margin: 60px 0;
+}
+.aptk-highlights--list > ul > li {
+  width: 33.33%;
+  float: left;
+  padding: 30px 0;
+}
+.aptk-highlights--list > ul > li:nth-child(1) {
+  padding-right: 20px;
+}
+.aptk-highlights--list > ul > li:nth-child(2) {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.aptk-highlights--list > ul > li:nth-child(3) {
+  padding-left: 20px;
+}
+.aptk-highlights--list > ul > li img {
+  height: 60px;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+.aptk-highlights--list > ul > li h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.aptk-highlights--list > ul > li p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+
+
+.aptk-features {
+  padding: 80px 0;
+  background: #E0E5EB;
+  position: relative;
+  z-index: 40;
+}
+.aptk-features.standalone {
+  padding: 160px 0 80px;
+  min-height: calc(100vh - 228px);
+}
+.aptk-features table {
+  border-collapse: collapse;
+}
+.aptk-features table td {
+  vertical-align: middle;
+  width: 50%;
+}
+.aptk-features--list {
+  margin: 40px 0 20px 0;
+}
+.aptk-features--list ~ .aptk-features--list {
+  margin-top: 80px;
+}
+.aptk-features--list ul {
+  padding: 20px 0;
+}
+.aptk-features--list ul li {
+  padding: 20px 0;
+  opacity: 0.8;
+}
+.aptk-features--list img {
+  height: 300px;
+  margin: 20px 0;
+  transition: all 0.2s ease;
+}
+.aptk-features--list img.alt {
+  width: 100%;
+  height: auto;
+}
+.aptk-features--list p {
+  max-width: 400px;
+}
+.aptk-features .aptk-cap > p {
+  line-height: 24px;
+  margin-top: 10px;
+}
+.aptk-features .aptk-button {
+  margin-top: 20px;
+}
+.aptk-features--list img:hover {
+  transform: scale(1.1);
+}
+
+
+.aptk-final {
+  padding: 80px 0;
+  background: #FFFFFF;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.1);
+  position: relative;
+  z-index: 40;
+}
+.aptk-final h2 {
+  margin-bottom: 10px;
+}
+.aptk-final .aptk-button {
+  margin-top: 20px;
+}
+.aptk-final.blue {
+  background: #298192;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+
+.aptk-footer {
+  position: relative;
+  z-index: 80;
+  width: 100%;
+  height: auto;
+  background: #263540;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.1);
+  color: #fff;
+  font-size: 12px;
+}
+.aptk-footer table {
+  width: 100%;
+}
+.aptk-footer table td {
+  padding: 30px 0;
+  vertical-align: top;
+}
+.aptk-footer img {
+  height: 30px;
+  margin-bottom: 10px;
+}
+.aptk-footer h3 {
+  color: #fff !important;
+  opacity: 1;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+.aptk-footer p,
+.aptk-footer ul li {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+.aptk-footer ul li {
+  line-height: 20px;
+}
+.aptk-footer ul li:hover {
+  text-decoration: underline;
+}
+.aptk-footer--links {
+  margin-top: 20px;
+}
+.aptk-footer--links a {
+  margin-right: 10px;
+}
+
+.aptk-app {
+  margin-top: 40px;
+}
+.aptk-app--icon {
+  width: calc(33.33% - 4px);
+  display: inline-block;
+  text-align: center;
+  margin-bottom: 40px;
+  vertical-align: top;
+  transition: background 0.3s ease;
+  padding-bottom: 10px;
+}
+.aptk-app--icon:hover {
+  background: rgba(224, 229, 235, 0.5);
+}
+.aptk-app--icon img {
+  width: 100px;
+  padding: 10px 0;
+  transition: all 0.3s ease;
+}
+.aptk-app--preview {
+  width: 100%;
+}
+.aptk-app--icon h2 {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+.aptk-app--icon p {
+  font-size: 14px;
+  padding: 0 10px;
+}
+.aptk-app .aptk-button {
+  background: rgba(224, 229, 235, 0.5);
+  color: rgba(59, 76, 89, 0.7);
+}
+
+
+.aptk-popup {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+}
+.aptk-popup.visible {
+  pointer-events: all;
+}
+.aptk-popup table {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  padding: 20px 0;
+}
+.aptk-popup table td {
+  padding: 0 20px;
+}
+.aptk-popup--overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(59, 76, 89, 0.7);
+  position: absolute;
+  opacity: 0;
+  left: 0;
+  top: 0;
+  -webkit-transition: all .3s ease;
+  -moz-transition: all .3s ease;
+  -o-transition: all .3s ease;
+  transition: all .3s ease;
+}
+.aptk-popup.visible .aptk-popup--overlay {
+  opacity: 1;
+}
+.aptk-popup.visible .aptk-popup--content {
+  top: 0;
+}
+.aptk-popup--content {
+  -webkit-transition: all .4s ease;
+  -moz-transition: all .4s ease;
+  -o-transition: all .4s ease;
+  transition: all .4s ease;
+  background: #fff;
+  border-radius: 8px;
+  z-index: 10000;
+  position: relative;
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  top: 100vh;
+  position: relative;
+}
+.aptk-popup--content h1 {
+  font-size: 20px;
+}
+.aptk-popup--content p {
+  font-size: 13px;
+}
+
+
+.aptk-form div {
+  margin-bottom: 10px;
+}
+.aptk-form div.half {
+  width: calc(50% - 5px);
+  display: inline-block;
+}
+.aptk-form div.half ~ div.half {
+  margin-left: 5px;
+}
+.aptk-form label {
+  text-transform: uppercase;
+  font-family: 'Montserrat';
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  display: block;
+}
+.aptk-form label span {
+  color: #BB4660;
+}
+.aptk-form input {
+  background: #E0E5EB;
+  border: 0;
+  border-radius: 2px;
+  height: 30px;
+  padding: 0 10px;
+  margin: 0px;
+  display: block;
+  width: 100%;
+  font-size: 13px;
+}
+.aptk-form select {
+  background: #E0E5EB;
+  border: 0;
+  margin: 0px;
+  border-radius: 2px;
+  height: 30px;
+  padding: 0 10px;
+  display: block;
+  width: 100%;
+  font-size: 12px;
+}
+input:-webkit-autofill {
+  box-shadow: inset 0 0 0px 30px #E0E5EB;
+  -webkit-box-shadow: inset 0 0 0px 30px #E0E5EB;
+}
+.aptk-form textarea {
+  background: #E0E5EB;
+  border: 0;
+  border-radius: 2px;
+  height: 30px;
+  padding: 10px;
+  margin: 0px;
+  display: block;
+  width: 100%;
+  height: 100px;
+  resize: vertical;
+}
+.aptk-form ~ .aptk-button,
+.aptk-form .aptk-button {
+  width: 100%;
+  display: block;
+  margin-top: 15px;
+}
+
+
+.aptk-link {
+  color: #21A2A8;
+  text-decoration: underline;
+}
+
+
+
+
+.wvr-toc {
+  position: fixed;
+  left: 0px;
+  top: 50px;
+  width: 280px;
+  z-index: 10;
+  bottom: 0px;
+  background: #394F60;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.wvr-toc--list a {
+  color: #FFFFFF;
+  text-decoration: none;
+  height: 24px;
+  line-height: 24px;
+  font-size: 12px;
+  display: block;
+}
+.wvr-toc--list a:hover {
+  background: #21A2A8;
+}
+.wvr-toc--list .h2 {
+  margin-bottom: 10px;
+}
+.wvr-toc--list .h2 > a {
+  opacity: 0.9;
+  padding-left: 10px;
+}
+.wvr-toc--list .h2 > a ~ ul > li > a {
+  opacity: 0.7;
+  padding-left: 20px;
+}
+.wvr-toc--list .h2 > a ~ ul > li > a ~ ul > li > a {
+  opacity: 0.5;
+  padding-left: 30px;
+}
+.wvr-toc::-webkit-scrollbar {
+  width: 0px;
+}
+
+.wvr-content {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 280px;
+  right: 0;
+  padding: 40px 0 0 0;
+  z-index: 1;
+  color: #394F60;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: 14px;
+}
+.wvr-content .aptk-footer {
+  margin-top: 50px;
+}
+
+.wvr-break {
+  height: 40px;
+}
+
+.wvr-section {
+  padding: 0 40px;
+}
+.wvr-section h2 {
+  margin-bottom: 5px;
+  color: #394F60;
+}
+.wvr-section h4 {
+  opacity: 0.8;
+  color: #394F60;
+}
+.wvr-section ul li {
+  opacity: 0.8;
+  color: #394F60;
+}
+.wvr-section > p {
+  margin-bottom: 20px;
+  color: #394F60;
+}
+
+.wvr-screenshot {
+  width: calc(100% - 20px);
+  border: 1px solid #394F60;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.3);
+  border-radius: 4px;
+  max-width: 720px;
+  margin: 20px auto;
+  display: block;
+  position: relative;
+}
+.wvr-screenshot p {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background: rgba(59, 76, 89, 0.9);
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 12px;
+  height: 30px;
+  line-height: 30px;
+  right: 0px;
+}
+.wvr-screenshot img {
+  width: 100%;
+}
+
+
+.wvr-element {
+  background: #394F60;
+  width: 70px;
+  height: 50px;
+  padding: 9px 0;
+  text-align: center;
+  border-radius: 4px;
+  margin: 10px 0 10px 0;
+}
+.wvr-element i {
+  font-size: 20px;
+  padding-bottom: 1px;
+  color: #FFFFFF;
+}
+.wvr-element h4 {
+  font-size: 10px;
+  margin: 0px;
+  font-weight: 400;
+  color: #FFFFFF;
+}
+
+.wvr-warning a {
+  text-decoration: underline;
+}
+
+.wvr-warning {
+  background: #BB4660;
+  opacity: 1;
+  color: #FFFFFF;
+  border-radius: 4px;
+  padding: 10px 10px 10px 10px;
+  font-size: 14px;
+  margin: 20px 0;
+  display: block;
+  max-width: 720px;
+  position: relative;
+}
+
+.CodeMirror,
+.CodeMirror * {
+  font-family: monospace !important;
+  font-size: 13px;
+}
+
+.wvr-code--example textarea ~ .CodeMirror {
+  height: 250px;
+  width: calc(50% - 10px);
+  display: inline-block;
+  margin-bottom: 20px;
+}
+.wvr-code--example .result ~ .CodeMirror {
+  margin-left: 10px;
+}
+
+
+.wvr-example {
+  background: #21A2A8;
+  color: #FFFFFF;
+  opacity: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+
+.no-cap .aptk-cap {
+  max-width: initial;
+}
+
+
+.aptk-stats {
+  position: fixed;
+  background: pink;
+  bottom: 0px;
+  left: 0px;
+  margin: 20px;
+  padding: 10px 30px;
+  border-radius: 8px;
+  z-index: 200;
+  background: #46BBAE;
+  color: #fff;
+}
+
+.aptk-samples {
+  padding: 40px 0;
+  color: #394F60;
+}
+.aptk-sample {
+  display: inline-block;
+  background: #fff;
+  border-radius: 6px;
+  padding: 12px;
+  width: calc(33.33% - 24px);
+  margin: 10px;
+  box-shadow: 0 0 10px rgba(59, 76, 89, 0.05);
+}
+.aptk-sample.mid {
+  text-align: center;
+}
+.aptk-sample.mid img {
+  width: 80px;
+}
+.aptk-sample h3 {
+  font-size: 14px;
+}
+.aptk-sample p {
+  font-size: 13px;
+}
+.aptk-sample img {
+  width: 100%;
+  margin: 12px 0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.aptk-sample img:hover {
+  transform: scale(0.95);
+}
+.aptk-sample button {
+  font-size: 13px;
+  width: 100%;
+}
+.aptk-sample button.action {
+  margin-bottom: 10px;
+}
+
+/* 800 move features to stack */
+@media only screen and (max-width: 800px) {
+
+  .aptk-features--list table td {
+    display: block;
+    width: 100%;
+  }
+  .aptk-features--list table td img {
+    width: 100%;
+    height: auto;
+  }
+
+  .aptk-app--icon {
+    width: 100%;
+    display: block;
+  }
+
+  .aptk-footer table td {
+    display: block;
+    width: 100% !important;
+
+  }
+
+}
+
+/* move highlights to stack */
+@media only screen and (max-width: 600px) {
+
+  .aptk-documentation--menu > ul {
+    display: none;
+  }
+
+  .aptk-documentation--content {
+    margin-left: 0px;
+    margin-top: 70px;
+    width: 100%;
+  }
+
+  .aptk-documentation--menu {
+    left: 30px;
+    top: 150px;
+    width: calc(100% - 60px);
+    z-index: 1000;
+  }
+
+  .aptk-documentation--image {
+    width: 100%;
+  }
+
+  .aptk-highlights--list ul li {
+    width: 100%;
+    display: block;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  .aptk-splash h1 img {
+    display: block;
+    margin: auto;
+  }
+
+  .aptk-splash h1 {
+    padding: 0 20px;
+    width: 100%;
+    font-size: 30px;
+  }
+
+  .aptk-header--logo ~ .aptk-button,
+  .aptk-header .aptk-cap > a ~ .aptk-button {
+    display: none;
+  }
+
+  .aptk-header--nav {
+    display: none;
+  }
+
+  .aptk.mobile .aptk-menu,
+  .aptk.mobile .aptk-menu--nav,
+  .aptk.mobile .aptk-header--nav {
+    display: block;
+    z-index: 1000;
+  }
+
+  .aptk.mobile .aptk-header--nav > ul {
+    display: none;
+  }
+
+  .aptk.mobile .aptk-menu {
+    height: calc(100vh - 80px);
+    top: 80px;
+    padding: 20px 0 20px 0;
+    bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .aptk.mobile .aptk-menu--nav h2 {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+
+  .aptk.mobile .aptk-menu--nav {
+    padding-bottom: 20px;
+    height: auto;
+  }
+
+  .aptk.mobile .aptk-menu--nav li {
+    display: block;
+    width: 100%;
+    float: none;
+  }
+
+  .aptk.mobile .aptk-menu--nav li h1 {
+    line-height: 30px;
+    font-size: 14px;
+  }
+
+  .aptk.mobile .aptk-menu--nav li p {
+    display: none;
+  }
+
+  .aptk.mobile .aptk-menu .aptk-button.mobile-contact {
+    display: block;
+  }
+
+  .aptk-subheader h1 {
+    font-size: 14px;
+  }
+
+  .aptk-subheader--nav {
+    display: none;
+  }
+
+  .aptk-button.mobile {
+    display: block !important;
+  }
+
+  .aptk-popup table td {
+    padding: 0px;
+  }
+
+  .aptk-popup.visible .aptk-popup--content {
+    max-width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    border-radius: 0px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .aptk-splash--arrow {
+    display: none;
+  }
+
+  .aptk-button {
+    padding: 0 20px;
+  }
+
+  .aptk-subheader h1 {
+    font-size: 13px;
+  }
+
+  .aptk-splash {
+    min-height: calc(100vh - 160px);
+    height: auto;
+  }
+
+  .aptk-stats {
+    font-size: 13px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .aptk-footer .submenu {
+    display: none;
+  }
+
+}
+
+/* classic */
+.bodyDiv .aptk-documentation--menu {
+  top: 120px;
+  max-height: 100px;
+}
+
+.bodyDiv .aptk-documentation--menu > ul {
+  max-height: calc(100vh - 300px);
+}
+
+.bodyDiv .aptk-content {
+  height: calc(100vh - 190px);
+  overflow: auto;
+}
