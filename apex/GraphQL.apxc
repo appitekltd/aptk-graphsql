@@ -410,7 +410,10 @@ global with sharing class GraphQL {
     List<String> optionList = new List<String>();
     Map<String, String> options = new Map<String, String>();
     String nickname = null;
+<<<<<<< HEAD
     String reference = null;
+=======
+>>>>>>> 428259a7e16521e1659024bc08a5be7082977a67
       
     // if we have options add them to the option list
     if (objectName.indexOf('(') != -1) {
@@ -432,12 +435,15 @@ global with sharing class GraphQL {
       nickname = objectName;
     }
       
+<<<<<<< HEAD
     // if we have a reference name set it, i.e. Contact[AccountId](limit:2)
     if (objectName.indexOf('[') != -1 && objectName.indexOf(']') != -1) {
       reference = objectName.split('\\[')[1].split('\\]')[0];
       objectName = objectName.split('\\[')[0];
     }
       
+=======
+>>>>>>> 428259a7e16521e1659024bc08a5be7082977a67
     // get the actual object in SF and it's relationships
     SObjectType objType = Schema.getGlobalDescribe().get(objectName);
     Map<String, String> actualChildren = new Map<String, String>();
