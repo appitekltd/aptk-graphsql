@@ -1,0 +1,11 @@
+@isTest
+global class GraphQLTestMock implements HttpCalloutMock {
+    
+  global HTTPResponse respond(HTTPRequest req) {
+    HttpResponse res = new HttpResponse();
+    res.setHeader('Content-Type', 'application/json');
+    res.setBody('{"query":"{ Nickname: Account(limit:1){Id Name Contact{Id Name} Lead(Name:$test) {Id Name}}}", "variables": {"test": "tester"} }');
+    res.setStatusCode(200);
+    return res;
+  }
+}

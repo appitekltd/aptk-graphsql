@@ -130,6 +130,7 @@ global with sharing class GraphQL {
       // not a mutation, run queries
       // get our request parsed as JSON structure
       Map<String, ObjectData> objectRequest = graphQLToJson(query);
+      System.debug(objectRequest);
         
       // for each of the objects in our json build the query for it
       // we then run the query and save the data back on the object
@@ -254,6 +255,7 @@ global with sharing class GraphQL {
       
     // Split the query into each finished section
     List<String> sections = query.split('\\}');
+    System.debug(sections);
       
     // This json will match the structure of the GraphQL query
     Map<String, ObjectData> json = new Map<String, ObjectData>();
@@ -262,18 +264,23 @@ global with sharing class GraphQL {
     // What our current object is and how far down we've gone
     ObjectData current;
     List<ObjectData> history = new List<ObjectData>();
+    List<String> debugHistory = new List<String>();
       
     // Go through each section
     for (Integer s = 0; s < sections.size(); s++) {
       List<String> section = sections[s].split('\\{');
       for (Integer i = 0; i < section.size(); i++) {
         String segment = section[i];
+        System.debug('PROCESSING SEGMENT ' + segment);
         if (segment != '') {
             
           // start of an object nest
           if (segment.indexOf('XSTARTX') != -1 && segment.indexOf('XENDX') == -1) {
             List<String> parameters = segment.split(' ');
             String objec = parameters[parameters.size() - 2];
+            
+            System.debug('S: CURRENT OBJECT ' + (current != null ? current.objectName : 'NO CURRENT'));
+            System.debug('S: HISTORY ' + debugHistory);
               
             // only object
             if (parameters.size() == 2) {
@@ -282,6 +289,7 @@ global with sharing class GraphQL {
                 json.put(obj.objectName, obj);
                 current = json.get(obj.objectName);
                 history.add(current); 
+                debugHistory.add(current.objectName);
               } else {
                 break;
               }
@@ -305,14 +313,17 @@ global with sharing class GraphQL {
                   // set the object as the first current
                   json.put(obj.objectName, obj);
                   current = json.get(obj.objectName);
+                  history.add(current);
+                  debugHistory.add(current.objectName);
                 } else {
                     
                   // otherwise update the current
                   current.requestFields = fields;
                   current.requestChildren.put(obj.objectName, obj);
                   current = current.requestChildren.get(obj.objectName);
+                  history.add(current);
+                  debugHistory.add(current.objectName);
                 }
-                history.add(current);
               } else {
                 break;
               }
@@ -323,7 +334,11 @@ global with sharing class GraphQL {
               
             // update our history
             if (history.size() > 0) history.remove(history.size() - 1);
-            current = history.size() - 1 > 0 ? history[history.size() - 1] : null;
+            current = history.size() > 0 ? history[history.size() - 1] : null;
+              
+            System.debug('E: CURRENT OBJECT ' + (current != null ? current.objectName : 'NO CURRENT'));
+            System.debug('E: HISTORY ' + debugHistory);
+              
             if (segment.indexOf('XSTARTX') != -1) {
               List<String> parameters = segment.split('XENDX')[1].split(' ');
               String objec = parameters[parameters.size() - 2];
@@ -410,10 +425,7 @@ global with sharing class GraphQL {
     List<String> optionList = new List<String>();
     Map<String, String> options = new Map<String, String>();
     String nickname = null;
-<<<<<<< HEAD
     String reference = null;
-=======
->>>>>>> 428259a7e16521e1659024bc08a5be7082977a67
       
     // if we have options add them to the option list
     if (objectName.indexOf('(') != -1) {
@@ -435,15 +447,12 @@ global with sharing class GraphQL {
       nickname = objectName;
     }
       
-<<<<<<< HEAD
     // if we have a reference name set it, i.e. Contact[AccountId](limit:2)
     if (objectName.indexOf('[') != -1 && objectName.indexOf(']') != -1) {
       reference = objectName.split('\\[')[1].split('\\]')[0];
       objectName = objectName.split('\\[')[0];
     }
       
-=======
->>>>>>> 428259a7e16521e1659024bc08a5be7082977a67
     // get the actual object in SF and it's relationships
     SObjectType objType = Schema.getGlobalDescribe().get(objectName);
     Map<String, String> actualChildren = new Map<String, String>();
@@ -636,18 +645,19 @@ global with sharing class GraphQL {
           if (field.indexOf('.') != -1) {
               
             List<String> dots = field.split('\\.');
-            String ref = dots[0];
-            Map<String, Object> robj = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(r));
+            String ref = dots[0]; // Account
+            sObject robj = r.getSObject(ref);
             Object result;
             dots.remove(0);
             Integer dotSize = dots.size();
-            System.debug(dots);
+            System.debug(dots); // [Name]
             System.debug(dotSize);
             for (Integer d = 0; d < dotSize; d++) {
               if (d <  dotSize - 1 && dotSize > 1) {
-                robj = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(robj));
+                robj = robj.getSObject(dots[d]);
+              } else {
+                result = robj.get(dots[d]);
               }
-              result = robj.get(dots[d]);
             }
             res.put(field, result);
           } else {
