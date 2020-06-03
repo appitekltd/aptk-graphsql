@@ -594,10 +594,16 @@ global with sharing class GraphQL {
       String filter = obj.queryOptions.get(realFields[i]);
       if (filter != null) {
         filter = EncodingUtil.urlDecode(filter, 'UTF-8');
-        if (query.indexOf('WHERE') == -1) {
-          query += ' WHERE ' + realFields[i] + ' = \'' + filter + '\'';
+        // check if we need to add strings around values 
+        if (filter.substring(0, 1) == '\'' && filter.substring(filter.length() - 1, filter.length()) == '\'') {
+          // dont do anything if people added single quotes
         } else {
-          query += ' AND ' + realFields[i] + ' = \'' + filter + '\'';
+          if (filter.isNumeric() == false) filter = '\'' + filter + '\'';
+        }
+        if (query.indexOf('WHERE') == -1) {
+          query += ' WHERE ' + realFields[i] + ' = ' + filter;
+        } else {
+          query += ' AND ' + realFields[i] + ' = ' + filter;
         }
       }
     }
