@@ -408,7 +408,7 @@ global with sharing class GraphQL {
     }
       
     // make any spacing consistent
-    newquery = newquery.replaceAll('\n', '').replaceAll('\t\t', ' ').replaceAll('\t', ' ').replaceAll('  ', ' ').replaceAll(': ', ':');
+    newquery = newquery.replaceAll('\n', '').replaceAll('\t\t', ' ').replaceAll('\t', ' ').replaceAll('  ', ' ').replaceAll(': ', ':').replaceAll('\\+', '%2b');
     return newquery;
   }
     
@@ -598,7 +598,8 @@ global with sharing class GraphQL {
         if (filter.substring(0, 1) == '\'' && filter.substring(filter.length() - 1, filter.length()) == '\'') {
           // dont do anything if people added single quotes
         } else {
-          if (filter.isNumeric() == false) filter = '\'' + filter + '\'';
+          // add quotes unless number or boolean
+          if (isNumeric(filter) == false && isBoolean(filter) == false) filter = '\'' + filter + '\'';
         }
         if (query.indexOf('WHERE') == -1) {
           query += ' WHERE ' + realFields[i] + ' = ' + filter;
@@ -620,6 +621,16 @@ global with sharing class GraphQL {
     queries.add(query);
     return query;
       
+  }
+    
+    
+  private static Boolean isBoolean(String value) {
+    try {
+      Boolean val = Boolean.valueOf(value);
+      return true;
+    } catch(Exception e) {
+      return false;
+    }
   }
     
 
@@ -693,6 +704,18 @@ global with sharing class GraphQL {
         
     }
     return updated;
+  }
+    
+  // private method to check numerics
+  private static Boolean isNumeric(String s){
+    Boolean check;
+    try {
+      Decimal.valueOf(s);
+      check = true;
+    } catch (Exception e) {
+      check = false;
+    }
+    return check;
   }
     
 

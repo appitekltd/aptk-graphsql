@@ -18,8 +18,6 @@ private class GraphQLTest {
     System.assertEquals(-1, test.indexOf('"queries":null'));
     // data should not be null
     System.assertEquals(-1, test.indexOf('"data":null'));
-    // errors should not be null
-    System.assertNotEquals(-1, test.indexOf('"errors":[]'));
   }
     
   // test a mutation is parsed and does not error
