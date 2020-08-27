@@ -131,6 +131,9 @@ global with sharing class GraphQL {
       // get our request parsed as JSON structure
       Map<String, ObjectData> objectRequest = graphQLToJson(query);
       System.debug(objectRequest);
+
+      // extract field nicknames
+      extractRequestedFieldsNicknames(objectRequest);
         
       // for each of the objects in our json build the query for it
       // we then run the query and save the data back on the object
@@ -491,6 +494,7 @@ global with sharing class GraphQL {
     obj.objectName = objectName;
     obj.referenceName = reference;
     obj.objectNickname = nickname;
+    obj.requestedFieldsNicknames = new Map<String,String> ();
     obj.actualFields = actualFields;
     obj.requestFields = new List<String>();
     obj.actualChildren = actualChildren;
@@ -676,9 +680,9 @@ global with sharing class GraphQL {
                 result = robj.get(dots[d]);
               }
             }
-            res.put(field, result);
+            res.put((obj.requestedFieldsNicknames.get(field) != null)? obj.requestedFieldsNicknames.get(field): field, result);
           } else {
-            res.put(field, r.get(field));
+            res.put((obj.requestedFieldsNicknames.get(field) != null)? obj.requestedFieldsNicknames.get(field): field, r.get(field));
           }
         } catch(Exception e) {
           parseErrors.add('Error: ' + e.getMessage());
@@ -705,6 +709,35 @@ global with sharing class GraphQL {
     }
     return updated;
   }
+
+
+  /*
+   *  @method - extractRequestedFieldsNicknames()
+   *  @desc - When a request comes with field nicknames
+   *    then extract the nicknames into a separate map of the objectData
+   */ 
+  private static void extractRequestedFieldsNicknames(Map<String,ObjectData> objectRequest){
+    // for each objecData 
+    for(ObjectData obj :objectRequest.values()){
+      // check the requested field  
+      for (Integer i = 0; i < obj.requestFields.size(); i++) {        
+        String field = obj.requestFields[i];
+
+        // if we have a nickname set the nickname
+        if (field.indexOf(':') != -1) {
+          field = field.replaceAll( '\\s+', '');
+          String nickname = field.split(':')[0];
+          field = field.split(':')[1];
+
+          // split nicknames and requested fields and save in the object data attribute
+          obj.requestFields[i] = field;
+          obj.requestedFieldsNicknames.put(field,nickname);
+        } 
+        extractRequestedFieldsNicknames(obj.requestChildren);
+      }
+    }
+  }
+
     
   // private method to check numerics
   private static Boolean isNumeric(String s){
@@ -745,10 +778,11 @@ global with sharing class GraphQL {
     public String objectNickname;
     public String referenceName;
     public List<String> requestFields;
+    public Map<String,String> requestedFieldsNicknames;
     public List<String> actualFields;
     public Map<String, ObjectData> requestChildren;
     public Map<String, String> actualChildren;
   }
-    
+
 
 }
