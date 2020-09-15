@@ -9,7 +9,7 @@ private class GraphQLTest {
   @IsTest
   private static void testRunQuery() {
     // test basic query
-    String query = '{ Nickname: Account(limit:1){Id Name Contact{Id Name} Lead(Name:$test) {Id Name}}';
+    String query = '{ Nickname: Account(limit:1){Id Test:Name CreatedBy.Id Contact[AccountId]{Id Name} Lead(Name:$test) {Id Name}}';
     Map<String, String> vars = new Map<String, String>();
     vars.put('test', 'tester');
     String test = GraphQL.runQuery(query, vars);
