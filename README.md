@@ -9,8 +9,8 @@ This package adds GraphQL query support directly into Salesforce, allowing you t
 It adds this via a custom RestResource endpoint that parses a GraphQL string query into a JSON-like structure, then runs the needed SOQL queries to get the data and returns it in the same structure.
 
 ## Future Features ##
-~~- Mutations~~ Implemented
-~~- Field Aliases~~ Implemented
+- ~~- Mutations~~ Implemented
+- ~~- Field Aliases~~ Implemented
 - Fragments
 - Multiple Queries in a request
 
